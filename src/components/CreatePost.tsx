@@ -8,6 +8,8 @@ import { AvatarImage } from "./ui/avatar";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { ImageIcon, Loader2Icon, SendIcon } from "lucide-react";
+import { createPost } from "@/actions/post.action";
+import toast from "react-hot-toast";
 
 function CreatePost() {
   const { user } = useUser();
@@ -20,10 +22,16 @@ function CreatePost() {
     if (!content.trim() && !imageUrl) return;
     setIsPosting(true);
     try {
-      await createPost(content,imageUrl);
+      const result = await createPost(content, imageUrl);
+      if (result?.success) {
+        setContent("");
+        setImageUrl("");
+        setShowImageUpload(false);
+
+        toast.success("Post created successfully");
+      }
     } catch (error) {
-      
-    }finally{
+    } finally {
       setIsPosting(false);
     }
   };
@@ -60,9 +68,7 @@ function CreatePost() {
                   Photo
                 </Button>
               </div>
-              <Button className="flex items-center"
-                onClick={handleSubmit}
-                disabled={(!content.trim() && !imageUrl) || isPosting}>
+              <Button className="flex items-center" onClick={handleSubmit} disabled={(!content.trim() && !imageUrl) || isPosting}>
                 {isPosting ? (
                   <>
                     <Loader2Icon className="size-4 mr-2 animate-spin" />
